@@ -4,3 +4,6 @@ lib
 *.cfg
 lib64
 keys
+.vscode
+.keys
+.pylintrc
