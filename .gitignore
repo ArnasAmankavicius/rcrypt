@@ -7,3 +7,6 @@ keys
 .vscode
 .keys
 .pylintrc
+*.7z
+*.enc
+__pycache__
