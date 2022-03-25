@@ -13,7 +13,7 @@ To decrypt a file use the following:
 
 `python main.py -f file_path -a -d rsa_privkey`
 
-To generate the RSA pair"
+To generate the RSA pair:
 
 `python main.py -g key_size`
 
