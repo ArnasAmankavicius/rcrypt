@@ -68,7 +68,44 @@ def encrypt_file(file_path: str, rsa_key: str, chunk_size = 2097152):
                 file_out.write(ciphertext)
                 bar(len(data))
     except KeyboardInterrupt:
-        print('encryptiong interrupted...')
+        print('encryption interrupted...')
 
     _close_file(file_in)
     _close_file(file_out)
+
+def decrypt_file(file_path: str, rsa_key: str, chunk_size = 2097152):
+    print('getting rsa info...')
+    key = RSA.import_key(open(rsa_key).read())
+    
+    try:
+        print('extracting file info...')
+        file_in = open(file_path, 'rb')
+        file_size = get_file_size(file_in)
+        enc_session_key = file_in.read(key.size_in_bytes())
+
+        print('decrypting session key...')
+        cipher_rsa = PKCS1_OAEP.new(key)
+        session_key = cipher_rsa.decrypt(enc_session_key)
+        new_file_path = file_path.removesuffix('.enc')
+        file_out = open(new_file_path, 'wb')
+
+        print('decrypting and verifying data...')
+        with alive_bar(file_size, title='decrypting...') as bar:
+            bar(key.size_in_bytes())
+            while(data := file_in.read(chunk_size + 16 + 16)):
+                nonce = data[:16]
+                cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
+                tag = data[16:32]
+                ciphertext = data[32:]
+                # --------------------
+                data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+                file_out.write(data)
+                bar(len(nonce) + len(tag) + len(ciphertext))
+    except KeyboardInterrupt:
+        print('decryption interrupted...')
+    except ValueError as e:
+        print(e)
+    
+    _close_file(file_in)
+    _close_file(file_out)
+

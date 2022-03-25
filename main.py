@@ -109,8 +109,6 @@ def encrypt_file_algo(file_path: str, rsa_key: str, chunk_size = 2097152):
                 bar(len(data))
     except KeyboardInterrupt:
         print("encryption interrupted...")
-
-
     try:
         file_out.close()
         print('file_out handler closed...')
